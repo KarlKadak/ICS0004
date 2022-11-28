@@ -37,8 +37,8 @@ void Structs();
 int main()
 {
 	printf("TalTech - ICS0004 - Fundamentals of Programming\n2022-2023 exercise solutions\n");
-	int action = 1;
-	char buffer[100];
+	int action;
+	char buffer[81];
 	while (1)
 	{
 		printf("\n\nSelect which topic's exercises you wish to run and enter the corresponding number:\n1 - Fundamentals\n2 - Deeper\n3 - Pointers\n4 - Structs\n5 - All\n0 - Exit\nSelection: ");
