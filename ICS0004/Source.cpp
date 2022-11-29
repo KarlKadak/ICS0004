@@ -40,7 +40,8 @@ int CountConsonants();//EXERCISE 4
 
 //POINTERS FUNCTION PROTOTYPES
 
-
+char* Reverse(char*);//EXERCISE 1
+char* ReformatName(char*);//EXERCISE 2
 
 //STRUCTS FUNCTION PROTOTYPES
 
@@ -410,7 +411,33 @@ void Deeper()
 
 void Pointers()
 {
-
+	//INPUTS FOR FUNCTIONS ARE CONSTANT - NO USER INPUT IS NEEDED, USER CAN MODIFY FUNCTION INPUTS FROM THE SOURCE CODE
+	//EXERCISE 1
+	char toReverse[] = "My name is John";//INPUT
+	printf("\n\nReverse\n%s\n", toReverse);
+	char* fromReverse = Reverse(toReverse);
+	if (fromReverse)
+	{
+		printf("%s\n\n", fromReverse);
+		free(fromReverse);
+	}
+	else
+	{
+		printf("Input error!\n\n");
+	}
+	//EXERCISE 2
+	char toReformatName[] = "John Smith";//INPUT
+	printf("\n\ReformatName\n%s\n", toReformatName);
+	char* fromReformatName = ReformatName(toReformatName);
+	if (fromReformatName)
+	{
+		printf("%s\n\n", fromReformatName);
+		free(fromReformatName);
+	}
+	else
+	{
+		printf("Input error!\n\n");
+	}
 }
 
 void Structs()
@@ -582,7 +609,46 @@ int CountConsonants()//EXERCISE 4
 
 //POINTERS FUNCTIONS
 
+char* Reverse(char* input)//EXERCISE 1
+{
+	if (input == 0 || *input == 0)
+	{
+		return 0;
+	}
+	int length = 0;
+	while (input[++length] != 0);
+	char* output = (char*)malloc(sizeof(char) * (length + 1));
+	for (int i = 0; i < length; i++)
+	{
+		output[i] = input[length - i - 1];
+	}
+	output[length] = 0;
+	return output;
+}
 
+char* ReformatName(char* input)
+{
+	if (input == 0 || *input == 0)
+	{
+		return 0;
+	}
+	int foreLength = 0, surLength = 0;
+	while (input[++foreLength] != ' ');
+	while (input[++surLength + foreLength + 1] != 0);
+	char* output = (char*)malloc(sizeof(char) * (foreLength + surLength + 3));
+	for (int i = 0; i < surLength; i++)
+	{
+		output[i] = input[foreLength + 1 + i];
+	}
+	output[surLength] = ',';
+	output[surLength + 1] = ' ';
+	for (int i = 0; i < foreLength; i++)
+	{
+		output[surLength + 2 + i] = input[i];
+	}
+	output[surLength + foreLength + 2] = 0;
+	return output;
+}
 
 //STRUCTS FUNCTIONS
 
