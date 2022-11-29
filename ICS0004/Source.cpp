@@ -3,6 +3,14 @@
 #include <conio.h>
 #include <math.h>
 #include <ctype.h>
+#include <memory>
+
+#define SUCCESS 0
+#define NEGMEMBERS 1
+#define ZEROMEMBERS 2
+#define OVER1000MEMBERS 3
+#define POINTERZERO 4
+#define EMPTYARRAY 5
 
 #pragma warning ( disable : 4996 )
 
@@ -42,6 +50,10 @@ int CountConsonants();//EXERCISE 4
 
 char* Reverse(char*);//EXERCISE 1
 char* ReformatName(char*);//EXERCISE 2
+int CheckSum(int*, int, int*);//EXERCISE 3
+char** SentenceSplit(char*, int*);//EXERCISE 4
+int InsertName(char*, int, char*);//EXERCISE 5
+int RemoveName(char*, char*);//EXERCISE 6
 
 //STRUCTS FUNCTION PROTOTYPES
 
@@ -412,6 +424,7 @@ void Deeper()
 void Pointers()
 {
 	//INPUTS FOR FUNCTIONS ARE CONSTANT - NO USER INPUT IS NEEDED, USER CAN MODIFY FUNCTION INPUTS FROM THE SOURCE CODE
+	//EXAMPLE FUNCTIONS LIKE CreateRandomString() AND CreateRandomName() ARE NOT USED
 	//EXERCISE 1
 	char toReverse[] = "My name is John";//INPUT
 	printf("\n\nReverse\n%s\n", toReverse);
@@ -437,6 +450,78 @@ void Pointers()
 	else
 	{
 		printf("Input error!\n\n");
+	}
+	//EXERCISE 3
+	int toCheckSum[] = { 2, 3, 105, 18, 72 };//INPUT
+	int nCheckSumElements = sizeof(toCheckSum) / sizeof(int), errorCode;
+	printf("CheckSum\ntoCheckSum, %i, &errorCode\n", nCheckSumElements);
+	int fromCheckSum = CheckSum(toCheckSum, nCheckSumElements, &errorCode);
+	switch (errorCode)
+	{
+	case SUCCESS:
+		printf("%i\n\n", fromCheckSum);
+		break;
+	case NEGMEMBERS:
+		printf("Negative members in array!\n\n");
+		break;
+	case ZEROMEMBERS:
+		printf("0 value members in array!\n\n");
+		break;
+	case OVER1000MEMBERS:
+		printf(">1000 value members in array!\n\n");
+		break;
+	case POINTERZERO:
+		printf("Pointer to array is 0!\n\n");
+		break;
+	case EMPTYARRAY:
+		printf("Empty array!\n\n");
+		break;
+	default:
+		printf("Unknown error!\n\n");
+		break;
+	}
+	//EXERCISE 4
+	char toSentenceSplit[] = "My name is John";//INPUT
+	int nSentenceSplitWords = 1;
+	printf("SentenceSplit\n%s, &nSentenceSplitWords\n", toSentenceSplit);
+	char** fromSentenceSplit = SentenceSplit(toSentenceSplit, &nSentenceSplitWords);
+	if (fromSentenceSplit)
+	{
+		for (int i = 0; i < nSentenceSplitWords; i++)
+		{
+			printf("%s\n", fromSentenceSplit[i]);
+			free(fromSentenceSplit[i]);
+		}
+		free(fromSentenceSplit);
+	}
+	else
+	{
+		printf("Input error!\n");
+	}
+	printf("\n");
+	//EXERCISE 5
+	const int toInsertNameBytes = 32; char toInsertName[toInsertNameBytes] = "John,Mary,James,Elizabeth", nameToInsert[] = "David";//INPUT
+	printf("InsertName\n%s, %i, %s\n", toInsertName, toInsertNameBytes, nameToInsert);
+	int fromInsertName = InsertName(toInsertName, toInsertNameBytes, nameToInsert);
+	if (fromInsertName)
+	{
+		printf("%s\n\n", toInsertName);
+	}
+	else
+	{
+		printf("Not enough bytes for the expanded list / input error!\n\n");
+	}
+	//EXERCISE 6
+	char toRemoveName[] = "John,Mary,James,Elizabeth", nameToRemove[] = "John";//INPUT
+	printf("RemoveName\n%s, %s\n", toRemoveName, nameToRemove);
+	int fromRemoveName = RemoveName(toRemoveName, nameToRemove);
+	if (fromRemoveName)
+	{
+		printf("%s\n\n", toRemoveName);
+	}
+	else
+	{
+		printf("Name was not found from the list / input error!\n\n");
 	}
 }
 
@@ -648,6 +733,114 @@ char* ReformatName(char* input)
 	}
 	output[surLength + foreLength + 2] = 0;
 	return output;
+}
+
+int CheckSum(int* input, int nElements, int* errorCode)//EXERCISE 3
+{
+	if (input == 0)
+	{
+		*errorCode = POINTERZERO;
+		return 0;
+	}
+	if (nElements == 0)
+	{
+		*errorCode = EMPTYARRAY;
+		return 0;
+	}
+	int output = 0;
+	for (int i = 0; i < nElements; i++)
+	{
+		if (input[i] < 0)
+		{
+			*errorCode = NEGMEMBERS;
+			return 0;
+		}
+		if (input[i] == 0)
+		{
+			*errorCode = ZEROMEMBERS;
+			return 0;
+		}
+		if (input[i] > 1000)
+		{
+			*errorCode = OVER1000MEMBERS;
+			return 0;
+		}
+		output += input[i];
+	}
+	*errorCode = SUCCESS;
+	return output;
+}
+
+char** SentenceSplit(char* input, int* nWords)//EXERCISE 4
+{
+	if (input == 0 || *input == 0 || nWords == 0)
+	{
+		return 0;
+	}
+	for (int i = 0; input[i] != 0; i++)
+	{
+		if (input[i] == ' ')
+		{
+			(*nWords)++;
+		}
+	}
+	int toSkip = 0, length;
+	char** output = (char**)malloc(sizeof(char*) * *nWords);
+	for (int i = 0; i < *nWords; i++)
+	{
+		for (length = 0; input[toSkip + length] != ' ' && input[toSkip + length] != 0; length++);
+		output[i] = (char*)malloc(sizeof(char) * (length + 1));
+		for (int j = 0; j < length; j++)
+		{
+			output[i][j] = input[toSkip + j];
+		}
+		output[i][length] = 0;
+		toSkip += length + 1;
+	}
+	return output;
+}
+
+int InsertName(char* list, int nBytes, char* name)//EXERCISE 5
+{
+	if (list == 0 || *list == 0 || name == 0 || *name == 0)
+	{
+		return 0;
+	}
+	int listLength = 0, nameLength = 0;
+	while (list[++listLength] != 0);
+	while (name[++nameLength] != 0);
+	if (listLength + nameLength + 2 > nBytes)
+	{
+		return 0;
+	}
+	list[listLength] = ',';
+	for (int i = 0; i < nameLength; i++)
+	{
+		list[listLength + 1 + i] = name[i];
+	}
+	list[listLength + nameLength + 1] = 0;
+	return 1;
+}
+
+int RemoveName(char* list, char* name)//EXERCISE 6
+{
+	if (list == 0 || *list == 0 || name == 0 || *name == 0)
+	{
+		return 0;
+	}
+	int listLength = 0, nameLength = 0;
+	while (list[++listLength] != 0);
+	while (name[++nameLength] != 0);
+	for (int i = 0; i < listLength; i++)
+	{
+		if (!memcmp(list + i, name, sizeof(char) * nameLength))
+		{
+			memmove(list + i, list + i + sizeof(char) * nameLength + 1, listLength - i - nameLength);
+			list[listLength - nameLength - 1] = 0;
+			return 1;
+		}
+	}
+	return 0;
 }
 
 //STRUCTS FUNCTIONS
