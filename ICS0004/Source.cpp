@@ -54,6 +54,8 @@ int CheckSum(int*, int, int*);//EXERCISE 3
 char** SentenceSplit(char*, int*);//EXERCISE 4
 int InsertName(char*, int, char*);//EXERCISE 5
 int RemoveName(char*, char*);//EXERCISE 6
+int CharFreq(char*, char);//EXERCISE 7
+int* CharFreqs(char*);//EXERCISE 8
 
 //STRUCTS FUNCTION PROTOTYPES
 
@@ -523,6 +525,36 @@ void Pointers()
 	{
 		printf("Name was not found from the list / input error!\n\n");
 	}
+	//EXERCISE 7
+	char toCharFreq[] = "Jesse James", charToFreq = 'e';//INPUT
+	printf("CharFreq\n%s, %c\n", toCharFreq, charToFreq);
+	int fromCharFreq = CharFreq(toCharFreq, charToFreq);
+	if (fromCharFreq)
+	{
+		printf("%i\n\n", fromCharFreq);
+	}
+	else
+	{
+		printf("Character was not found from input string / input error!\n\n");
+	}
+	//EXERCISE 8
+	char toCharFreqs[] = "Butch Cassidy";//INPUT
+	printf("CharFreqs\n%s\n", toCharFreqs);
+	char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	int* fromCharFreqs = CharFreqs(toCharFreqs);
+	if (fromCharFreqs)
+	{
+		for (int i = 0; i < 26; i++)
+		{
+			printf("%c - %i  ", alphabet[i], fromCharFreqs[i]);
+		}
+		free(fromCharFreqs);
+	}
+	else
+	{
+		printf("Input error!");
+	}
+	printf("\n\n");
 }
 
 void Structs()
@@ -841,6 +873,38 @@ int RemoveName(char* list, char* name)//EXERCISE 6
 		}
 	}
 	return 0;
+}
+
+int CharFreq(char* input, char c)//EXERCISE 7
+{
+	if (input == 0 || *input == 0)
+	{
+		return 0;
+	}
+	int output = 0;
+	char* buffer = input;
+	while (strchr(buffer, c))
+	{
+		output++;
+		buffer = strchr(buffer, c) + 1;
+	}
+	return output;
+}
+
+int* CharFreqs(char* input)//EXERCISE 8
+{
+	if (input == 0 || *input == 0)
+	{
+		return 0;
+	}
+	int* output = (int*)malloc(sizeof(int) * 26);
+	char alphabet[] = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+	for (int i = 0; i < 26; i++)
+	{
+		output[i] = CharFreq(input, alphabet[i]);
+		output[i] += CharFreq(input, tolower(alphabet[i]));
+	}
+	return output;
 }
 
 //STRUCTS FUNCTIONS
