@@ -2,10 +2,16 @@
 #include <stdlib.h>
 #include <conio.h>
 #include <math.h>
+#include <ctype.h>
 
 #pragma warning ( disable : 4996 )
 
 //SLIDES - http://www.tud.ttu.ee/im/Viktor.Leppikson/ICS0004%20Slides.html
+
+//GLOBAL VARIABLES
+
+int RandVal[100], DeeperError;
+char Table[5][5], Buf1[81], Buf2[81], selection[81] = "";
 
 //STRUCTS
 
@@ -25,7 +31,12 @@ double TempConverter(double, char);//EXERCISE 12
 
 //DEEPER FUNCTION PROTOTYPES
 
-
+int GetRandArray(int);//EXERCISE 1
+void FillTable();//EXERCISE 2
+void RemoveSpace();//EXERCISE 3
+void ConvertToLower();//EXERCISE 4
+int CountVowels();//EXERCISE 4
+int CountConsonants();//EXERCISE 4
 
 //POINTERS FUNCTION PROTOTYPES
 
@@ -309,7 +320,92 @@ void Fundamentals()
 
 void Deeper()
 {
-
+	char line[81];
+	//EXERCISE 1
+	printf("\n\nPseudo-random number array generator function\nEnter number of values: ");
+	scanf("%s", line);
+	int toRandArray = atoi(line), fromRandArray = GetRandArray(toRandArray);
+	if (DeeperError == 0)
+	{
+		printf("Maximum of %i generated numbers: %i\n\n", toRandArray, fromRandArray);
+	}
+	else
+	{
+		printf("Error in input data!\n\n");
+	}
+	//EXERCISE 2
+	printf("Table pattern filler function:\n");
+	FillTable();
+	for (int i = 0; i < 5; i++)
+	{
+		for (int j = 0; j < 5; j++)
+		{
+			printf("%c ", Table[i][j]);
+		}
+		printf("\n");
+	}
+	printf("\n");
+	//EXERCISE 3
+	printf("Excess space remover function: ");
+	for (int i = 0; i < 82; i++)
+	{
+		Buf1[i] = _getche();
+		if (Buf1[i] == '\r' || i == 81)
+		{
+			Buf1[i] = 0;
+			printf("\n");
+			break;
+		}
+	}//DUE TO KEYBOARD BUFFER ISSUES, THIS SOLUTION IS NECESSARY FOR GETTING USER INPUT BUT IT DISABLES THE FUNCTIONALITY OF BACKSPACE
+	RemoveSpace();
+	printf("Text after compressing: %s\n\n", Buf2);
+	//EXERCISE 4
+	printf("Menu selection:");
+	while (selection[0] != 'x')
+	{
+		printf("\nv - count vowels\nc - count consonants\nx - exit\n");
+		scanf("%s", selection);
+		selection[0] = tolower(selection[0]);
+		if (selection[0] == 'v')
+		{
+			printf("Type the text you wish to count vowels from: ");
+			for (int i = 0; i < 82; i++)
+			{
+				Buf1[i] = _getche();
+				if (Buf1[i] == '\r' || i == 81)
+				{
+					Buf1[i] = 0;
+					printf("\n");
+					break;
+				}
+			}//DUE TO KEYBOARD BUFFER ISSUES, THIS SOLUTION IS NECESSARY FOR GETTING USER INPUT BUT IT DISABLES THE FUNCTIONALITY OF BACKSPACE
+			printf("Total vowels: %i\n", CountVowels());
+		}
+		else if (selection[0] == 'c')
+		{
+			printf("Type the text you wish to count consonants from: ");
+			for (int i = 0; i < 82; i++)
+			{
+				Buf1[i] = _getche();
+				if (Buf1[i] == '\r' || i == 81)
+				{
+					Buf1[i] = 0;
+					printf("\n");
+					break;
+				}
+			}//DUE TO KEYBOARD BUFFER ISSUES, THIS SOLUTION IS NECESSARY FOR GETTING USER INPUT BUT IT DISABLES THE FUNCTIONALITY OF BACKSPACE
+			printf("Total consonants: %i\n", CountConsonants());
+		}
+		else if (selection[0] == 'x')
+		{
+			break;
+		}
+		else
+		{
+			printf("Unrecognized character, try again!\n");
+		}
+	}
+	printf("\n\n");
 }
 
 void Pointers()
@@ -365,7 +461,124 @@ double TempConverter(double value, char unit)//EXERCISE 12
 
 //DEEPER FUNCTIONS
 
+int GetRandArray(int nValues)//EXERCISE 1
+{
+	if (nValues < 1 || nValues > 100)
+	{
+		DeeperError = -1;
+		return 0;
+	}
+	int output = 0;
+	for (int i = 0; i < nValues; i++)
+	{
+		RandVal[i] = rand();
+		if (RandVal[i] > output)
+		{
+			output = RandVal[i];
+		}
+	}
+	DeeperError = 0;
+	return output;
+}
 
+void FillTable()//EXERCISE 2
+{
+	for (int i = 0; i < 5; i++)
+	{
+		for (int j = 0; j < 5; j++)
+		{
+			if (i == j)
+			{
+				Table[i][j] = '*';
+			}
+			else if (i < j)
+			{
+				Table[i][j] = '+';
+			}
+			else
+			{
+				Table[i][j] = '-';
+			}
+		}
+	}
+}
+
+void RemoveSpace()//EXERCISE 3
+{
+	for (int i = 0, j = 0; Buf1[i] != 0; i++)
+	{
+		if (Buf1[i] == ' ')
+		{
+			if (i != 0 && Buf1[i - 1] != ' ')
+			{
+				Buf2[j++] = ' ';
+			}
+		}
+		else
+		{
+			Buf2[j++] = Buf1[i];
+		}
+		if (Buf1[i + 1] == 0)
+		{
+			Buf2[j + 1] = 0;
+		}
+	}
+}
+
+void ConvertToLower()//EXERCISE 4
+{
+	for (int i = 0; Buf1[i] != 0; i++)
+	{
+		Buf1[i] = tolower(Buf1[i]);
+	}
+}
+
+int CountVowels()//EXERCISE 4
+{
+	ConvertToLower();
+	int output = 0;
+	char vowels[] = { 'a', 'e', 'i', 'o', 'u', 'y' };
+	for (int i = 0; Buf1[i] != 0; i++)
+	{
+		if (isalpha(Buf1[i]))
+		{
+			for (int j = 0; j < 6; j++)
+			{
+				if (Buf1[i] == vowels[j])
+				{
+					output++;
+					break;
+				}
+			}
+		}
+	}
+	return output;
+}
+
+int CountConsonants()//EXERCISE 4
+{
+	ConvertToLower();
+	int output = 0;
+	char vowels[] = { 'a', 'e', 'i', 'o', 'u', 'y' };
+	for (int i = 0; Buf1[i] != 0; i++)
+	{
+		if (isalpha(Buf1[i]))
+		{
+			for (int j = 0; j < 6; j++)
+			{
+				if (Buf1[i] == vowels[j])
+				{
+					break;
+				}
+				if (j == 5)
+				{
+					output++;
+				}
+			}
+		}
+	}
+	return output;
+}
 
 //POINTERS FUNCTIONS
 
