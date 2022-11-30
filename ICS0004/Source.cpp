@@ -56,6 +56,11 @@ int InsertName(char*, int, char*);//EXERCISE 5
 int RemoveName(char*, char*);//EXERCISE 6
 int CharFreq(char*, char);//EXERCISE 7
 int* CharFreqs(char*);//EXERCISE 8
+int WordFreq(char*);//EXERCISE 9
+char** SentenceSplit2(char*, int*);//EXERCISE 10
+int WordExist(char**, int, const char*);//EXERCISE 11
+int WordSearch(char*, const char*);//EXERCISE 12
+char* WordReplace(char*, const char*, const char*);//EXERCISE 13
 
 //STRUCTS FUNCTION PROTOTYPES
 
@@ -555,6 +560,88 @@ void Pointers()
 		printf("Input error!");
 	}
 	printf("\n\n");
+	//EXERCISE 9
+	char toWordFreq[] = "My name is John";//INPUT
+	printf("WordFreq\n%s\n", toWordFreq);
+	int fromWordFreq = WordFreq(toWordFreq);
+	if (fromWordFreq)
+	{
+		printf("%i\n\n", fromWordFreq);
+	}
+	else
+	{
+		printf("Input error!\n\n");
+	}
+	//EXERCISE 10
+	char toSentenceSplit2[] = "My name is John";//INPUT
+	printf("SentenceSplit2\n%s, &nSentenceSplit2Words\n", toSentenceSplit2);
+	int nSentenceSplit2Words;
+	char** fromSentenceSplit2 = SentenceSplit2(toSentenceSplit2, &nSentenceSplit2Words);
+	if (fromSentenceSplit2)
+	{
+		for (int i = 0; i < nSentenceSplit2Words; i++)
+		{
+			printf("%s\n", fromSentenceSplit2[i]);
+		}
+		printf("\n");
+	}
+	else
+	{
+		printf("Input error!\n\n");
+	}
+	//EXERCISE 11
+	if (fromSentenceSplit2)
+	{
+		char wordToExist[] = "John";//INPUT
+		printf("WordExist\ntenOutput, %i, %s\n", nSentenceSplit2Words, wordToExist);
+		int fromWordExist = WordExist(fromSentenceSplit2, nSentenceSplit2Words, wordToExist);
+		if (fromWordExist == 1)
+		{
+			printf("The word exists in the table!\n\n");
+		}
+		else if (fromWordExist == 0)
+		{
+			printf("The word does not exist in the table!\n\n");
+		}
+		else
+		{
+			printf("Input error!\n\n");
+		}
+		for (int i = 0; i < nSentenceSplit2Words; i++)
+		{
+			free(fromSentenceSplit2[i]);
+		}
+		free(fromSentenceSplit2);
+	}
+	else
+	{
+		printf("WordExist() cannot be used - SentenceSplit2() produced an error!\n\n");
+	}
+	//EXERCISE 12
+	char toWordSearch[] = "The concert started and the band started to play", wordToSearch[] = "and";//INPUT
+	printf("WordSearch\n%s, %s\n", toWordSearch, wordToSearch);
+	int fromWordSearch = WordSearch(toWordSearch, wordToSearch);
+	if (fromWordSearch)
+	{
+		printf("%i\n\n", fromWordSearch);
+	}
+	else
+	{
+		printf("Word doesn't exist in input string / input error!\n\n");
+	}
+	//EXERCISE 13
+	char toWordReplace[] = "I asked Mary to call me", wordToReplace[] = "Mary", replacementToReplace[] = "Elizabeth";//INPUT
+	printf("WordReplace\n%s, %s, %s\n", toWordReplace, wordToReplace, replacementToReplace);
+	char* fromWordReplace = WordReplace(toWordReplace, wordToReplace, replacementToReplace);
+	if (fromWordReplace)
+	{
+		printf("%s\n\n", fromWordReplace);
+		free(fromWordReplace);
+	}
+	else
+	{
+		printf("Word was not found / input error!\n\n");
+	}
 }
 
 void Structs()
@@ -905,6 +992,110 @@ int* CharFreqs(char* input)//EXERCISE 8
 		output[i] += CharFreq(input, tolower(alphabet[i]));
 	}
 	return output;
+}
+
+int WordFreq(char* input)//EXERCISE 9
+{
+	if (input == 0 || *input == 0)
+	{
+		return 0;
+	}
+	int output = 1;
+	for (char* buffer = input; strchr(buffer, ' '); buffer = strchr(buffer, ' ') + 1)
+	{
+		output++;
+	}
+	return output;
+}
+
+char** SentenceSplit2(char* input, int* nWords)//EXERCISE 10
+{
+	if (input == 0 || *input == 0 || nWords == 0)
+	{
+		return 0;
+	}
+	*nWords = WordFreq(input);
+	char** output = (char**)malloc(sizeof(char*) * *nWords);
+	for (int i = 0; i < *nWords; i++)
+	{
+		strtok(input, " ");
+		output[i] = (char*)malloc(sizeof(char) * (strlen(input) + 1));
+		strcpy(output[i], input);
+		input += strlen(input) + 1;
+	}
+	return output;
+}
+
+int WordExist(char** input, int nWords, const char* word)//EXERCISE 11
+{
+	if (input == 0 || word == 0 || *word == 0)
+	{
+		return -1;
+	}
+	for (int i = 0; i < nWords; i++)
+	{
+		if (!strcmp(input[i], word))
+		{
+			return 1;
+		}
+	}
+	return 0;
+}
+
+int WordSearch(char* input, const char* word)//EXERCISE 12
+{
+	if (input == 0 || *input == 0 || word == 0 || *word == 0)
+	{
+		return 0;
+	}
+	int output = 0, wordLength = strlen(word);
+	char* buffer = input;
+	while (strstr(buffer, word))
+	{
+		char* firstChar = strstr(buffer, word), * nextChar = strstr(buffer, word) + wordLength;
+		if ((firstChar == input && *nextChar == ' ') ||
+			(firstChar == input && *nextChar == 0) ||
+			(*(firstChar - 1) == ' ' && *nextChar == ' ') ||
+			(*(firstChar - 1) == ' ' && *nextChar == 0))
+		{
+			output++;
+		}
+		buffer = strstr(buffer, word) + 1;
+	}
+	return output;
+}
+
+char* WordReplace(char* input, const char* word, const char* replacement)//EXERCISE 13
+{
+	if (input == 0 || *input == 0 || word == 0 || *word == 0 || replacement == 0 || *replacement == 0)
+	{
+		return 0;
+	}
+	int inputLength = strlen(input), wordLength = strlen(word), replacementLength = strlen(replacement);
+	char* buffer = input;
+	while (strstr(buffer, word))
+	{
+		char* firstChar = strstr(buffer, word), * nextChar = strstr(buffer, word) + wordLength;
+		if ((firstChar == input && *nextChar == ' ') ||
+			(firstChar == input && *nextChar == 0) ||
+			(*(firstChar - 1) == ' ' && *nextChar == ' ') ||
+			(*(firstChar - 1) == ' ' && *nextChar == 0))
+		{
+			buffer = strstr(buffer, word);
+			char* output = (char*)malloc(sizeof(char) * (inputLength - wordLength + replacementLength + 1));
+			memmove(output, input, sizeof(char) * (buffer - input));
+			if (buffer != input)
+			{
+				output[buffer - input - 1] = ' ';
+			}
+			output[buffer - input] = 0;
+			strcat(output, replacement);
+			strcat(output, buffer + wordLength);
+			return output;
+		}
+		buffer = strstr(buffer, word) + 1;
+	}
+	return 0;
 }
 
 //STRUCTS FUNCTIONS
