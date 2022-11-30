@@ -23,7 +23,40 @@ char Table[5][5], Buf1[81], Buf2[81], selection[81] = "";
 
 //STRUCTS
 
+typedef struct Date
+{
+	int day;
+	char month[4];
+	int year;
+} DATE;//EXERCISES 1, 3 & 4
 
+typedef struct Exam
+{
+	const char* subject;
+	DATE date;
+	int mark;
+} EXAM;//EXERCISE 1
+
+typedef struct Date2
+{
+	int day;
+	char* month;
+	int year;
+} DATE2;//EXERCISE 2
+
+typedef struct Exam2
+{
+	char* subject;
+	DATE2 date;
+	int mark;
+} EXAM2;//EXERCISE 2
+
+typedef struct Exam3
+{
+	char* subject;
+	DATE date;
+	int mark;
+} EXAM3;//EXERCISES 3 & 4
 
 //TOPIC FUNCTION PROTOTYPES
 
@@ -64,7 +97,8 @@ char* WordReplace(char*, const char*, const char*);//EXERCISE 13
 
 //STRUCTS FUNCTION PROTOTYPES
 
-
+EXAM3* MySession(int*);//EXERCISE 3
+EXAM3** MySession2(int*);//EXERCISE 4
 
 //MAIN
 
@@ -646,7 +680,75 @@ void Pointers()
 
 void Structs()
 {
-
+	//EXERCISE 1
+	EXAM Exams[] = {
+		{ "ICS0004", { 14, "Dec", 2022 }, 4 },
+		{ "ICS0001", { 16, "Dec", 2022 }, 4 },
+		{ "ICS0002", { 6, "Jan", 2022 }, 3 }
+	};
+	printf("\n\nExercise 1\n");
+	int nExams = sizeof(Exams) / sizeof(EXAM);
+	double averageMark = 0;
+	for (int i = 0; i < nExams; i++)
+	{
+		printf("%s at %2d-%s-%d, mark is %d\n", Exams[i].subject, Exams[i].date.day, Exams[i].date.month, Exams[i].date.year, Exams[i].mark);
+		averageMark += Exams[i].mark / (double)nExams;//CASTING nExams TO DOUBLE IS NECESSARY FOR GETTING THE CORRECT RESULT WITH THIS CALCULATION METHOD
+	}
+	printf("Average mark: %lg\n\n", averageMark);
+	//EXERCISE 2
+	printf("Exercise 2\n");
+	EXAM2 Exams2[] = {
+		{ 0, { 14, 0, 2022 }, 5 },
+		{ 0, { 16, 0, 2022 }, 4 },
+		{ 0, { 6, 0, 2022 }, 5 }
+	};//ONLY MARKS ARE CHANGED COMPARED TO Exams[]
+	for (int i = 0; i < nExams; i++)
+	{
+		Exams2[i].subject = (char*)malloc(sizeof(char) * (strlen(Exams[i].subject) + 1));
+		strcpy(Exams2[i].subject, Exams[i].subject);
+	}//SUBJECTS ARE COPIED FROM Exams[], FOR THIS, BOTH ARRAYS HAVE TO CONTAIN THE SAME AMOUNT OF ELEMENTS
+	Exams2[0].date.month = (char*)malloc(sizeof(char) * 9);
+	strcpy(Exams2[0].date.month, "December");
+	Exams2[1].date.month = (char*)malloc(sizeof(char) * 9);
+	strcpy(Exams2[1].date.month, "December");
+	Exams2[2].date.month = (char*)malloc(sizeof(char) * 8);
+	strcpy(Exams2[2].date.month, "January");//ALLOCATE MEMORY FOR Exams2[x].date.month AND INITIALIZE THEM
+	double averageMark2 = 0;
+	for (int i = 0; i < nExams; i++)
+	{
+		printf("%s at %2d-%8s-%d, mark is %d\n", Exams2[i].subject, Exams2[i].date.day, Exams2[i].date.month, Exams2[i].date.year, Exams2[i].mark);
+		averageMark2 += Exams2[i].mark / (double)nExams;//CASTING nExams TO DOUBLE IS NECESSARY FOR GETTING THE CORRECT RESULT WITH THIS CALCULATION METHOD
+		free(Exams2[i].subject);
+		free(Exams2[i].date.month);
+	}
+	printf("Average mark: %lg\n\n", averageMark2);
+	//EXERCISE 3
+	printf("Exercise 3\n");
+	int nExams3;
+	EXAM3* Exams3 = MySession(&nExams3);
+	double averageMark3 = 0;
+	for (int i = 0; i < nExams3; i++)
+	{
+		printf("%s at %2d-%s-%d, mark is %d\n", Exams3[i].subject, Exams3[i].date.day, Exams3[i].date.month, Exams3[i].date.year, Exams3[i].mark);
+		averageMark3 += Exams3[i].mark / (double)nExams3;//CASTING nExams TO DOUBLE IS NECESSARY FOR GETTING THE CORRECT RESULT WITH THIS CALCULATION METHOD
+		free(Exams3[i].subject);
+	}
+	free(Exams3);
+	printf("Average mark: %lg\n\n", averageMark3);
+	//EXERCISE 4
+	printf("Exercise 4\n");
+	int nExams4;
+	EXAM3** Exams4 = MySession2(&nExams4);
+	double averageMark4 = 0;
+	for (int i = 0; i < nExams4; i++)
+	{
+		printf("%s at %2d-%s-%d, mark is %d\n", (*(Exams4[i])).subject, (*(Exams4[i])).date.day, (*(Exams4[i])).date.month, (*(Exams4[i])).date.year, (*(Exams4[i])).mark);
+		averageMark4 += (*(Exams4[i])).mark / (double)nExams4;//CASTING nExams TO DOUBLE IS NECESSARY FOR GETTING THE CORRECT RESULT WITH THIS CALCULATION METHOD
+		free((*(Exams4[i])).subject);
+		free(Exams4[i]);
+	}
+	free(Exams4);
+	printf("Average mark: %lg\n\n", averageMark4);
 }
 
 //FUNDAMENTALS FUNCTIONS
@@ -1100,3 +1202,54 @@ char* WordReplace(char* input, const char* word, const char* replacement)//EXERC
 
 //STRUCTS FUNCTIONS
 
+EXAM3* MySession(int* nExams)//EXERCISE 3
+{
+	if (nExams == 0 || *nExams == 0)
+	{
+		return 0;
+	}
+	EXAM3 Exams[] = {
+		{ 0, { 14, "Dec", 2022 }, 3 },
+		{ 0, { 16, "Dec", 2022 }, 4 },
+		{ 0, { 6, "Jan", 2022 }, 3 }
+	};//ONLY MARKS ARE CHANGED COMPARED TO Exams[] IN Structs()
+	*nExams = sizeof(Exams) / sizeof(EXAM3);
+	for (int i = 0; i < *nExams; i++)
+	{
+		Exams[i].subject = (char*)malloc(sizeof(char) * 8);
+	}
+	strcpy(Exams[0].subject, "ICS0004");
+	strcpy(Exams[1].subject, "ICS0001");
+	strcpy(Exams[2].subject, "ICS0002");
+	EXAM3* output = (EXAM3*)malloc(sizeof(Exams));
+	memmove(output, Exams, sizeof(Exams));
+	return output;
+}
+
+EXAM3** MySession2(int* nExams)//EXERCISE 4
+{
+	if (nExams == 0 || *nExams == 0)
+	{
+		return 0;
+	}
+	EXAM3 Exams[] = {
+		{ 0, { 14, "Dec", 2022 }, 3 },
+		{ 0, { 16, "Dec", 2022 }, 5 },
+		{ 0, { 6, "Jan", 2022 }, 2 }
+	};//ONLY MARKS ARE CHANGED COMPARED TO Exams[] IN Structs()
+	*nExams = sizeof(Exams) / sizeof(EXAM3);
+	for (int i = 0; i < *nExams; i++)
+	{
+		Exams[i].subject = (char*)malloc(sizeof(char) * 8);
+	}
+	strcpy(Exams[0].subject, "ICS0004");
+	strcpy(Exams[1].subject, "ICS0001");
+	strcpy(Exams[2].subject, "ICS0002");
+	EXAM3** output = (EXAM3**)malloc(sizeof(EXAM3*) * *nExams);
+	for (int i = 0; i < *nExams; i++)
+	{
+		output[i] = (EXAM3*)malloc(sizeof(EXAM3));
+		memmove(output[i], &(Exams[i]), sizeof(EXAM3));
+	}
+	return output;
+}
